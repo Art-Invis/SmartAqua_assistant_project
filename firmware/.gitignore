@@ -1,0 +1,36 @@
+# Системні файли IDE
+*.ino.cpp
+*.elf
+*.bin
+*.hex
+*.eep
+*.d
+*.o
+
+# Arduino build папка
+build/
+*.a
+
+# Файли резервних копій
+*~
+*.bak
+*.tmp
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Кеш VSCode 
+.vscode/
+*.code-workspace
+
+# Файли Arduino IDE для Mac/Linux
+*.dSYM/
+
+# Файли core/platform
+.pio/
+*.pyc

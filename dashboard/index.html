@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Акваріумний помічник | Панель керування</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Сайдбар -->
+  <div class="sidebar">
+    <!-- Бульбашки -->
+    <div class="bubble" style="width: 40px; height: 40px; top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="bubble" style="width: 25px; height: 25px; top: 50%; left: 70%; animation-delay: 1s;"></div>
+    <div class="bubble" style="width: 30px; height: 30px; top: 70%; left: 20%; animation-delay: 2s;"></div>
+    
+    <div class="sidebar-header">
+      <div class="card-icon">
+        <i class="fas fa-fish"></i>
+      </div>
+      <h2>Акваріум</h2>
+    </div>
+    <div class="sidebar-menu">
+      <a href="#" class="menu-item active">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Панель керування</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-thermometer-half"></i>
+        <span>Температура</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-tint"></i>
+        <span>Рівень води</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-clock"></i>
+        <span>Розклад годування</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-history"></i>
+        <span>Історія</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-cog"></i>
+        <span>Налаштування</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Основной контент -->
+  <div class="main-content">
+    <!-- Хедер -->
+    <header class="header">
+      <div class="header-title">
+        <h1><i class="fas fa-fish"></i> Акваріумний помічник <i class="fas fa-fish"></i></h1>
+      </div>
+      <div class="user-profile">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+      </div>
+    </header>
+
+    <!-- Контент -->
+    <div class="content">
+      <h2 class="page-title">
+        <i class="fas fa-tachometer-alt"></i>
+        Огляд системи
+      </h2>
+
+      <!-- Карточки -->
+      <div class="cards-grid">
+        <!-- Карточка времени -->
+        <div class="card clock-card fade-in" style="animation-delay: 0.1s;">
+          <div class="card-header">
+            <h3 class="card-title primary">
+              <i class="fas fa-clock"></i>
+              Поточний час
+            </h3>
+          </div>
+          <div class="card-body">
+            <div id="clock" class="card-value">--:--:--</div>
+            <div id="servo-status" class="status-badge status-inactive">Стан: Очікування</div>
+            <div id="alert-message" class="status-badge" style="background: rgba(23, 162, 184, 0.15); color: var(--info); border: 1px solid rgba(23, 162, 184, 0.3);">Статус: OK</div>
+          </div>
+        </div>
+
+        <!-- Карточка ручного кормления -->
+        <div class="card fade-in" style="animation-delay: 0.2s;">
+          <div class="card-header">
+            <h3 class="card-title success">
+              <i class="fas fa-utensils"></i>
+              Ручне годування
+            </h3>
+          </div>
+          <div class="card-body">
+            <button class="btn btn-success" onclick="feedNow()">
+              <i class="fas fa-fish"></i>
+              Нагодувати
+            </button>
+            <div id="last-fed-manual" style="margin-top: 20px; font-size: 15px; color: var(--dark);">
+              <i class="fas fa-history"></i> Останнє ручне годування: --
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка автоматического кормления -->
+        <div class="card fade-in" style="animation-delay: 0.3s;">
+          <div class="card-header">
+            <h3 class="card-title info">
+              <i class="fas fa-calendar-alt"></i>
+              Автогодування
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Час годування:</label>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <input type="time" id="feedTime" class="form-control">
+                <button class="btn btn-primary" onclick="setFeedingTime()" style="padding: 12px 15px;">
+                  <i class="fas fa-save"></i>
+                </button>
+              </div>
+            </div>
+            <div id="saved-time" style="margin: 15px 0; font-size: 15px; color: var(--dark);">
+              <i class="far fa-clock"></i> Обраний час: --:--
+            </div>
+            <div id="last-fed-auto" style="font-size: 15px; color: var(--dark);">
+              <i class="fas fa-history"></i> Останнє автогодівля: --
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- График температуры -->
+      <div class="chart-container fade-in" style="animation-delay: 0.4s;">
+        <h3 class="chart-title">
+          <i class="fas fa-thermometer-half"></i>
+          Температура води
+        </h3>
+        <canvas id="tempChart" height="200"></canvas>
+      </div>
+
+      <!-- График уровня воды -->
+      <div class="chart-container fade-in" style="animation-delay: 0.5s;">
+        <h3 class="chart-title">
+          <i class="fas fa-tint"></i>
+          Рівень води
+        </h3>
+        <canvas id="waterChart" height="200"></canvas>
+      </div>
+
+      <!-- История кормлений -->
+      <div class="feed-history fade-in" style="animation-delay: 0.6s;">
+        <h3 class="chart-title">
+          <i class="fas fa-history"></i>
+          Історія годувань
+        </h3>
+        <ul id="feed-log" style="list-style: none;">
+          <li class="history-item">
+            <span class="history-time">Завантаження...</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
