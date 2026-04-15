@@ -90,7 +90,7 @@ The project highlights IoT design principles, embedded programming in Arduino C+
 
 ## 👨‍🎓 Attribution
 
-Developed and maintained by **Artem Sokol**
+Developed and maintained by **Artem**
 Educational purpose only.
 
 © 2025 Artem. All sensors calibrated, all rights respected.
